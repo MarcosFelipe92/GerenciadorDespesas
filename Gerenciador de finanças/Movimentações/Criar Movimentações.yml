@@ -1,0 +1,28 @@
+info:
+  name: Criar Movimentações
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://{{host}}:{{port}}/movimentacoes/
+  body:
+    type: json
+    data: |-
+      [
+        {
+          "descricao": "Conta de Aluquel",
+          "valor": "180.00",
+          "data": "2026-06-20T00:00:00.000Z",
+          "paga": false,
+          "idTipo": 2,
+          "idCategoria": 3
+        }
+      ]
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

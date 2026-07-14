@@ -1,0 +1,6 @@
+name: local
+variables:
+  - name: host
+    value: localhost
+  - name: port
+    value: "8080"

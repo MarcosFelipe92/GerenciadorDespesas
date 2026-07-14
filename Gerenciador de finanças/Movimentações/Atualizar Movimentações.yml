@@ -1,0 +1,26 @@
+info:
+  name: Atualizar Movimentações
+  type: http
+  seq: 3
+
+http:
+  method: PUT
+  url: http://{{host}}:{{port}}/movimentacoes/4
+  body:
+    type: json
+    data: |-
+      {
+        "descricao": "Conta de Aluquel do Apartamento",
+        "valor": "1850.00",
+        "data": "2026-06-25T00:00:00.000Z",
+        "paga": false,
+        "idTipo": 2,
+        "idCategoria": 3
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
