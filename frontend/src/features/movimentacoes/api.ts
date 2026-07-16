@@ -4,7 +4,9 @@ export type TCreateMovimentacaoPayload = {
   descricao: string;
   valor: number;
   idTipo: number;
-  categoriaId: number;
+  idCategoria: number;
+  data: string;
+  paga?: boolean;
 };
 
 const API_URL = "http://localhost:8080/movimentacoes";
@@ -34,4 +36,35 @@ export const movimentacoesApi = {
     }
     return res.json();
   },
+
+  update: async (
+    id: number,
+    movimentacao: Partial<TCreateMovimentacaoPayload>,
+  ): Promise<{ message: string }> => {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(movimentacao),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error || "Erro ao atualizar movimentação");
+    }
+    return res.json();
+  },
+
+  delete: async (id: number): Promise<void> => {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error || "Erro ao excluir movimentação");
+    }
+  },
 };
+

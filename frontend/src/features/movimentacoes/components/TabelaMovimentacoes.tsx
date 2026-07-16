@@ -3,10 +3,14 @@ import { Button } from "../../../shared/components/Button";
 
 type TabelaMovimentacoesProps = {
   movimentacoes: TMovimentacao[];
+  onEditar: (mov: TMovimentacao) => void;
+  onExcluir: (id: number) => void;
 };
 
 export function TabelaMovimentacoes({
   movimentacoes,
+  onEditar,
+  onExcluir,
 }: TabelaMovimentacoesProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -49,11 +53,10 @@ export function TabelaMovimentacoes({
                 <td className="px-6 py-4 alignment-middle">
                   {mov.tipo && (
                     <span
-                      className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                        isEntrada
+                      className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${isEntrada
                           ? "bg-green-50 text-green-700 ring-green-600/20"
                           : "bg-red-50 text-red-700 ring-red-600/20"
-                      }`}
+                        }`}
                     >
                       {mov.tipo.descricao}
                     </span>
@@ -61,9 +64,8 @@ export function TabelaMovimentacoes({
                 </td>
                 {/* Coluna: Valor */}
                 <td
-                  className={`px-6 py-4 text-right font-semibold ${
-                    isEntrada ? "text-green-600" : "text-red-600"
-                  }`}
+                  className={`px-6 py-4 text-right font-semibold ${isEntrada ? "text-green-600" : "text-red-600"
+                    }`}
                 >
                   {isEntrada ? "+ " : "- "}
                   {Number(mov.valor).toLocaleString("pt-BR", {
@@ -74,10 +76,18 @@ export function TabelaMovimentacoes({
 
                 <td className="px-6 py-4">
                   <div className="flex justify-end items-center gap-2">
-                    <Button variant="red" className="w-24">
+                    <Button 
+                      variant="red" 
+                      className="w-24"
+                      onClick={() => onExcluir(mov.id)}
+                    >
                       Remover
                     </Button>
-                    <Button variant="amber" className="w-24">
+                    <Button 
+                      variant="amber" 
+                      className="w-24"
+                      onClick={() => onEditar(mov)}
+                    >
                       Editar
                     </Button>
                   </div>

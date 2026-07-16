@@ -6,19 +6,50 @@ import { Plus } from "lucide-react";
 import type { TMovimentacao } from "../../../types/movimentacoes.types";
 import type { TCategoria } from "../../../types/categorias.types";
 import type { TTipo } from "../../../types/tipos.types";
+import type { TCreateMovimentacaoPayload } from "../api";
 
 type SecaoMovimentacoesProps = {
   movimentacoes: TMovimentacao[];
   categorias: TCategoria[];
   tipos: TTipo[];
+  onCreate: (payload: TCreateMovimentacaoPayload) => Promise<void>;
+  onEditar: (id: number, payload: Partial<TCreateMovimentacaoPayload>) => Promise<void>;
+  onExcluir: (id: number) => Promise<void>;
 };
 
 export function SecaoMovimentacoes({
   categorias,
   movimentacoes,
   tipos,
+  onCreate,
+  onEditar,
+  onExcluir,
 }: SecaoMovimentacoesProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [movimentacaoParaEditar, setMovimentacaoParaEditar] = useState<TMovimentacao | undefined>(undefined);
+
+  const handleOpenNewModal = () => {
+    setMovimentacaoParaEditar(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (mov: TMovimentacao) => {
+    setMovimentacaoParaEditar(mov);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setMovimentacaoParaEditar(undefined);
+  };
+
+  const handleSubmit = async (payload: TCreateMovimentacaoPayload) => {
+    if (movimentacaoParaEditar) {
+      await onEditar(movimentacaoParaEditar.id, payload);
+    } else {
+      await onCreate(payload);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -35,20 +66,26 @@ export function SecaoMovimentacoes({
         <Button
           variant="lime"
           className="gap-2 text-xs h-9 font-semibold shadow-sm"
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenNewModal}
         >
           <Plus className="w-4 h-4" />
           Nova Movimentação
         </Button>
       </div>
 
-      <TabelaMovimentacoes movimentacoes={movimentacoes} />
+      <TabelaMovimentacoes
+        movimentacoes={movimentacoes}
+        onEditar={handleOpenEditModal}
+        onExcluir={onExcluir}
+      />
 
       <ModalNovaMovimentacao
         categorias={categorias}
         tipos={tipos}
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
+        movimentacaoParaEditar={movimentacaoParaEditar}
+        onSubmit={handleSubmit}
       />
     </div>
   );
