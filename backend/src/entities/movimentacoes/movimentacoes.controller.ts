@@ -42,6 +42,20 @@ export class MovimentacoesController {
     }
   };
 
+  getResumoAnual = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { ano } = req.query;
+      const anoNum = typeof ano === "string" ? Number(ano) : undefined;
+
+      const result = await this.movimentacoesService.getResumoAnual(anoNum);
+      res.status(200).json(result);
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ error: error.message || "Erro interno do servidor" });
+    }
+  };
+
   getById = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = Number(req.params.id);

@@ -10,6 +10,12 @@ export type TFiltrosMovimentacao = {
   dataFim?: string;
 };
 
+export type TAgregadoMensalRaw = {
+  mes: number;
+  idTipo: number;
+  total: number;
+};
+
 export class MovimentacoesRepository {
   async getAll(filtros?: TFiltrosMovimentacao): Promise<Movimentacoes[]> {
     const where: any = {};
@@ -39,6 +45,28 @@ export class MovimentacoesRepository {
       ],
       order: [["data", "DESC"]],
     });
+  }
+
+  async getTotaisAgregadosPorPeriodo(
+    dataInicio: string,
+    dataFim: string,
+  ): Promise<TAgregadoMensalRaw[]> {
+    const result = await db.Movimentacoes.findAll({
+      attributes: [
+        [db.Sequelize.literal(`EXTRACT(MONTH FROM "data")::INTEGER`), "mes"],
+        "idTipo",
+        [db.Sequelize.fn("SUM", db.Sequelize.col("valor")), "total"],
+      ],
+      where: {
+        data: {
+          [Op.between]: [dataInicio, dataFim],
+        },
+      },
+      group: [db.Sequelize.literal(`EXTRACT(MONTH FROM "data")`), "idTipo"],
+      raw: true,
+    });
+
+    return result as unknown as TAgregadoMensalRaw[];
   }
 
   async getById(id: number): Promise<Movimentacoes | null> {

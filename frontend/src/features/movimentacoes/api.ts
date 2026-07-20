@@ -5,6 +5,13 @@ export type TMovimentacaoFiltros = {
   dataFim?: string;
 };
 
+export type TResumoMensal = {
+  mes: number;
+  entradas: number;
+  saidas: number;
+  saldo: number;
+};
+
 export type TCreateMovimentacaoPayload = {
   descricao: string;
   valor: number;
@@ -37,6 +44,15 @@ export const movimentacoesApi = {
     if (!res.ok) throw new Error("Erro ao buscar saldo anterior");
     const data = await res.json();
     return data.saldoAnterior || 0;
+  },
+
+  getResumoAnual: async (ano?: number): Promise<TResumoMensal[]> => {
+    const anoParam = ano || new Date().getFullYear();
+    const url = `${API_URL}/resumo-anual?ano=${anoParam}`;
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error("Erro ao buscar resumo anual");
+    return res.json();
   },
 
   create: async (

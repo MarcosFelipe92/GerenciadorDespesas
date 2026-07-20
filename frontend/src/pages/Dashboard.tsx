@@ -6,6 +6,7 @@ import { movimentacoesApi } from "../features/movimentacoes/api";
 import type {
   TCreateMovimentacaoPayload,
   TMovimentacaoFiltros,
+  TResumoMensal,
 } from "../features/movimentacoes/api";
 import { categoriasApi } from "../features/categorias/api";
 import type { TMovimentacao } from "../types/movimentacoes.types";
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [categorias, setCategorias] = useState<TCategoria[]>([]);
   const [tipos, setTipos] = useState<TTipo[]>([]);
   const [saldoAnterior, setSaldoAnterior] = useState<number>(0);
+  const [resumoAnual, setResumoAnual] = useState<TResumoMensal[]>([]);
   const [filtros, setFiltros] = useState<TMovimentacaoFiltros | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -35,12 +37,17 @@ export default function Dashboard() {
   const carregarDadosFiltrados = useCallback(
     async (novosFiltros: TMovimentacaoFiltros) => {
       try {
-        const [dadosMov, saldo] = await Promise.all([
+        const [aStr] = (novosFiltros.dataInicio || "").split("-");
+        const anoParam = Number(aStr) || new Date().getFullYear();
+
+        const [dadosMov, saldo, resumo] = await Promise.all([
           movimentacoesApi.getAll(novosFiltros),
           movimentacoesApi.getSaldoAnterior(novosFiltros.dataInicio),
+          movimentacoesApi.getResumoAnual(anoParam),
         ]);
         setMovimentacoes(dadosMov);
         setSaldoAnterior(saldo);
+        setResumoAnual(resumo);
       } catch (err: any) {
         setErro(err.message || "Erro ao carregar movimentações");
       }
@@ -83,6 +90,18 @@ export default function Dashboard() {
     }
   };
 
+  const hoje = new Date();
+  let anoSelecionado = hoje.getFullYear();
+  let mesSelecionado = hoje.getMonth() + 1;
+
+  if (filtros?.dataInicio) {
+    const [a, m] = filtros.dataInicio.split("-").map(Number);
+    if (!isNaN(a) && !isNaN(m)) {
+      anoSelecionado = a;
+      mesSelecionado = m;
+    }
+  }
+
   if (erro) return <div className="p-6 text-red-500">Erro: {erro}</div>;
   if (carregando)
     return <div className="p-6 text-zinc-500">Carregando painel...</div>;
@@ -95,7 +114,13 @@ export default function Dashboard() {
         onFilterChange={handleFilterChange}
       />
 
-      <SecaoGraficos movimentacoes={movimentacoes} filtros={filtros} />
+      <SecaoGraficos
+        movimentacoes={movimentacoes}
+        filtros={filtros}
+        resumoAnual={resumoAnual}
+        mesSelecionado={mesSelecionado}
+        anoSelecionado={anoSelecionado}
+      />
 
       <SecaoMovimentacoes
         movimentacoes={movimentacoes}

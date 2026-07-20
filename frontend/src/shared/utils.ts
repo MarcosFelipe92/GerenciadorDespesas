@@ -35,6 +35,14 @@ export function formatarMoeda(valor: number): string {
   });
 }
 
+export function normalizarTexto(str: string): string {
+  if (!str) return "";
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 export const CORES_GRAFICO = [
   "#6366f1", // Indigo
   "#10b981", // Emerald

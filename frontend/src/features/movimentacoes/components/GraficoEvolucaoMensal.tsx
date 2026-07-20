@@ -34,40 +34,47 @@ export function GraficoEvolucaoMensal({
 
   const quantidadeDias = new Date(ano, mes, 0).getDate();
 
-  const diasMap: Record<
-    string,
-    { dia: string; entradas: number; saidas: number; dataFormatada: string }
-  > = {};
+  // Construir array ordenado do dia 1 ao último dia do mês
+  const chartData: {
+    dia: string;
+    entradas: number;
+    saidas: number;
+    dataFormatada: string;
+  }[] = [];
 
   for (let i = 1; i <= quantidadeDias; i++) {
     const diaStr = String(i).padStart(2, "0");
     const mesStr = String(mes).padStart(2, "0");
-    diasMap[diaStr] = {
+    chartData.push({
       dia: diaStr,
       entradas: 0,
       saidas: 0,
       dataFormatada: `${diaStr}/${mesStr}/${ano}`,
-    };
+    });
   }
 
   movimentacoes.forEach((mov) => {
     if (!mov.data) return;
     const dateOnly = mov.data.split("T")[0];
     const [aStr, mStr, dStr] = dateOnly.split("-");
+    const diaIndex = Number(dStr) - 1;
 
-    if (Number(aStr) === ano && Number(mStr) === mes && diasMap[dStr]) {
+    if (
+      Number(aStr) === ano &&
+      Number(mStr) === mes &&
+      diaIndex >= 0 &&
+      diaIndex < chartData.length
+    ) {
       const isEntrada = mov.tipo?.descricao === "Entrada" || mov.idTipo === 1;
       const valor = Number(mov.valor) || 0;
 
       if (isEntrada) {
-        diasMap[dStr].entradas += valor;
+        chartData[diaIndex].entradas += valor;
       } else {
-        diasMap[dStr].saidas += valor;
+        chartData[diaIndex].saidas += valor;
       }
     }
   });
-
-  const chartData = Object.values(diasMap);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {

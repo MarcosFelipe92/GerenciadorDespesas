@@ -3,11 +3,12 @@ import { TabelaMovimentacoes } from "./TabelaMovimentacoes";
 import { ModalNovaMovimentacao } from "./ModalNovaMovimentacao";
 import { ModalConfirmacao } from "../../../shared/components/ModalConfirmacao";
 import { Button } from "../../../shared/components/Button";
-import { Plus } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import type { TMovimentacao } from "../../../types/movimentacoes.types";
 import type { TCategoria } from "../../../types/categorias.types";
 import type { TTipo } from "../../../types/tipos.types";
 import type { TCreateMovimentacaoPayload } from "../api";
+import { normalizarTexto } from "../../../shared/utils";
 
 type SecaoMovimentacoesProps = {
   movimentacoes: TMovimentacao[];
@@ -29,6 +30,7 @@ export function SecaoMovimentacoes({
   onEditar,
   onExcluir,
 }: SecaoMovimentacoesProps) {
+  const [termoBusca, setTermoBusca] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [movimentacaoParaEditar, setMovimentacaoParaEditar] = useState<
     TMovimentacao | undefined
@@ -78,9 +80,17 @@ export function SecaoMovimentacoes({
     }
   };
 
+  const movimentacoesFiltradas = movimentacoes.filter((mov) => {
+    if (!termoBusca.trim()) return true;
+    const buscaNorm = normalizarTexto(termoBusca);
+    const descNorm = normalizarTexto(mov.descricao || "");
+    const catNorm = normalizarTexto(mov.categoria?.descricao || "");
+    return descNorm.includes(buscaNorm) || catNorm.includes(buscaNorm);
+  });
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center px-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2">
         <div>
           <h2 className="text-xl font-bold text-zinc-900 tracking-tight">
             Movimentações
@@ -90,18 +100,41 @@ export function SecaoMovimentacoes({
           </p>
         </div>
 
-        <Button
-          variant="lime"
-          className="gap-2 text-xs h-9 font-semibold shadow-sm"
-          onClick={handleOpenNewModal}
-        >
-          <Plus className="w-4 h-4" />
-          Nova Movimentação
-        </Button>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {/* Campo de Busca estilo LIKE no Front */}
+          <div className="relative flex-1 sm:w-64">
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={termoBusca}
+              onChange={(e) => setTermoBusca(e.target.value)}
+              placeholder="Buscar por descrição..."
+              className="w-full pl-9 pr-8 py-2 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+            />
+            {termoBusca && (
+              <button
+                type="button"
+                onClick={() => setTermoBusca("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <Button
+            variant="lime"
+            className="gap-2 text-xs h-9 font-semibold shadow-sm shrink-0"
+            onClick={handleOpenNewModal}
+          >
+            <Plus className="w-4 h-4" />
+            Nova Movimentação
+          </Button>
+        </div>
       </div>
 
       <TabelaMovimentacoes
-        movimentacoes={movimentacoes}
+        movimentacoes={movimentacoesFiltradas}
         onEditar={handleOpenEditModal}
         onExcluir={handleOpenExcluirModal}
       />
