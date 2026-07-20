@@ -78,45 +78,45 @@ export function SecaoHeader({
   const saldoFinal = saldoAnterior + saldoPeriodo;
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm space-y-6">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm space-y-6 transition-colors">
       {/* Topo do Header: Seletor de Data / Mês */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-zinc-800">
         <div>
-          <h1 className="text-xl font-bold text-zinc-900 tracking-tight">
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
             Resumo Financeiro
           </h1>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Filtre por período para visualizar os saldos e movimentações.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 bg-zinc-50 p-1.5 rounded-lg border border-zinc-200">
+        <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/80 p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <button
             type="button"
             onClick={handleMesAnterior}
-            className="p-1.5 rounded-md hover:bg-white text-zinc-600 hover:text-zinc-900 transition-colors"
+            className="p-1.5 rounded-md hover:bg-white dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
             title="Mês anterior"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
           </button>
 
           <div className="flex items-center gap-2 px-2">
-            <Calendar className="w-4 h-4 text-zinc-400" />
+            <Calendar className="w-4 h-4 text-zinc-500 dark:text-zinc-300" />
             <input
               type="month"
               value={mesAno}
               onChange={(e) => setMesAno(e.target.value)}
-              className="bg-transparent text-sm font-semibold text-zinc-800 focus:outline-none cursor-pointer"
+              className="bg-transparent text-sm font-semibold text-zinc-800 dark:text-zinc-100 dark:[color-scheme:dark] focus:outline-none cursor-pointer"
             />
           </div>
 
           <button
             type="button"
             onClick={handleProximoMes}
-            className="p-1.5 rounded-md hover:bg-white text-zinc-600 hover:text-zinc-900 transition-colors"
+            className="p-1.5 rounded-md hover:bg-white dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
             title="Próximo mês"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
           </button>
         </div>
       </div>
@@ -124,47 +124,49 @@ export function SecaoHeader({
       {/* Grid com os 5 Indicadores */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* 1. Saldo Anterior */}
-        <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs font-semibold text-zinc-500">
+        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-300">
             <span>Saldo Anterior</span>
-            <Wallet className="w-4 h-4 text-zinc-400" />
+            <Wallet className="w-4 h-4 text-zinc-500 dark:text-zinc-300" />
           </div>
-          <p className="text-lg font-bold text-zinc-800">
+          <p className="text-lg font-bold text-zinc-800 dark:text-zinc-100">
             {formatarMoeda(saldoAnterior)}
           </p>
         </div>
 
         {/* 2. Entradas */}
-        <div className="rounded-lg border border-emerald-100 bg-emerald-50/40 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs font-semibold text-emerald-700">
+        <div className="rounded-lg border border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/30 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-emerald-700 dark:text-emerald-400">
             <span>Entradas</span>
-            <ArrowUpRight className="w-4 h-4 text-emerald-600" />
+            <ArrowUpRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <p className="text-lg font-bold text-emerald-700">
+          <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
             {formatarMoeda(entradas)}
           </p>
         </div>
 
         {/* 3. Saídas */}
-        <div className="rounded-lg border border-red-100 bg-red-50/40 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs font-semibold text-red-700">
+        <div className="rounded-lg border border-red-100 dark:border-red-900/50 bg-red-50/40 dark:bg-red-950/30 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-red-700 dark:text-red-400">
             <span>Saídas</span>
-            <ArrowDownLeft className="w-4 h-4 text-red-600" />
+            <ArrowDownLeft className="w-4 h-4 text-red-600 dark:text-red-400" />
           </div>
-          <p className="text-lg font-bold text-red-700">
+          <p className="text-lg font-bold text-red-700 dark:text-red-400">
             {formatarMoeda(saidas)}
           </p>
         </div>
 
         {/* 4. Saldo Período */}
-        <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 space-y-2">
-          <div className="flex items-center justify-between text-xs font-semibold text-zinc-500">
+        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-300">
             <span>Saldo Período</span>
-            <Scale className="w-4 h-4 text-zinc-400" />
+            <Scale className="w-4 h-4 text-zinc-500 dark:text-zinc-300" />
           </div>
           <p
             className={`text-lg font-bold ${
-              saldoPeriodo >= 0 ? "text-emerald-600" : "text-red-600"
+              saldoPeriodo >= 0
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-red-600 dark:text-red-400"
             }`}
           >
             {formatarMoeda(saldoPeriodo)}
@@ -172,10 +174,10 @@ export function SecaoHeader({
         </div>
 
         {/* 5. Saldo Final */}
-        <div className="rounded-lg border border-zinc-900 bg-zinc-900 p-4 space-y-2 text-white">
-          <div className="flex items-center justify-between text-xs font-semibold text-zinc-300">
+        <div className="rounded-lg border border-zinc-900 dark:border-zinc-700 bg-zinc-900 dark:bg-zinc-950 p-4 space-y-2 text-white shadow-sm">
+          <div className="flex items-center justify-between text-xs font-semibold text-zinc-300 dark:text-zinc-300">
             <span>Saldo Final</span>
-            <DollarSign className="w-4 h-4 text-lime-400" />
+            <DollarSign className="w-4 h-4 text-emerald-400" />
           </div>
           <p className="text-lg font-bold text-white">
             {formatarMoeda(saldoFinal)}

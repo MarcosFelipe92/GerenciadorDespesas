@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { BarChart3, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { formatarMoeda } from "../../../shared/utils";
+import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 type GraficoResumoAnualProps = {
   resumoAnual: TResumoMensal[];
@@ -53,6 +54,8 @@ export function GraficoResumoAnual({
   mesSelecionado,
   anoSelecionado,
 }: GraficoResumoAnualProps) {
+  const { isDark } = useTheme();
+
   const chartData = resumoAnual.map((item) => ({
     ...item,
     nomeMes: NOMES_CURTOS_MESES[item.mes - 1] || `${item.mes}`,
@@ -120,22 +123,26 @@ export function GraficoResumoAnual({
     if (active && payload && payload.length) {
       const item: TResumoMensal = payload[0].payload;
       return (
-        <div className="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg text-xs space-y-1.5 z-50 relative opacity-100">
-          <p className="font-bold text-zinc-900">
+        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-lg text-xs space-y-1.5 z-50 relative opacity-100">
+          <p className="font-bold text-zinc-900 dark:text-zinc-100">
             {NOMES_EXTENSOS_MESES[item.mes - 1]} / {anoSelecionado}
           </p>
-          <div className="flex items-center justify-between gap-4 text-emerald-600 font-medium">
+          <div className="flex items-center justify-between gap-4 text-emerald-600 dark:text-emerald-400 font-medium">
             <span>Entradas:</span>
             <span>{formatarMoeda(item.entradas)}</span>
           </div>
-          <div className="flex items-center justify-between gap-4 text-red-600 font-medium">
+          <div className="flex items-center justify-between gap-4 text-red-600 dark:text-red-400 font-medium">
             <span>Saídas:</span>
             <span>{formatarMoeda(item.saidas)}</span>
           </div>
-          <div className="flex items-center justify-between gap-4 text-zinc-900 font-bold pt-1 border-t border-zinc-100">
+          <div className="flex items-center justify-between gap-4 text-zinc-900 dark:text-zinc-100 font-bold pt-1 border-t border-zinc-100 dark:border-zinc-800">
             <span>Saldo Período:</span>
             <span
-              className={item.saldo >= 0 ? "text-emerald-600" : "text-red-600"}
+              className={
+                item.saldo >= 0
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-red-600 dark:text-red-400"
+              }
             >
               {formatarMoeda(item.saldo)}
             </span>
@@ -147,17 +154,17 @@ export function GraficoResumoAnual({
   };
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm space-y-4">
-      <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm space-y-4 transition-colors">
+      <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
         <div>
-          <h3 className="text-base font-bold text-zinc-900 tracking-tight">
+          <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
             Saldo Período Mês a Mês ({anoSelecionado})
           </h3>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Comparativo anual com destaque para o mês selecionado
           </p>
         </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
           <BarChart3 className="w-4 h-4" />
         </div>
       </div>
@@ -173,18 +180,18 @@ export function GraficoResumoAnual({
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                stroke="#f4f4f5"
+                stroke={isDark ? "#27272a" : "#f4f4f5"}
               />
               <XAxis
                 dataKey="nomeMes"
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 11, fill: "#71717a" }}
+                tick={{ fontSize: 11, fill: isDark ? "#a1a1aa" : "#71717a" }}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 11, fill: "#71717a" }}
+                tick={{ fontSize: 11, fill: isDark ? "#a1a1aa" : "#71717a" }}
                 tickFormatter={(val) =>
                   Math.abs(val) >= 1000
                     ? `R$ ${(val / 1000).toFixed(0)}k`
@@ -201,7 +208,13 @@ export function GraficoResumoAnual({
                   return (
                     <Cell
                       key={`bar-${entry.mes}`}
-                      fill={isSelecionado ? "#10b981" : "#e4e4e7"}
+                      fill={
+                        isSelecionado
+                          ? "#10b981"
+                          : isDark
+                          ? "#27272a"
+                          : "#e4e4e7"
+                      }
                       className="transition-all duration-300 hover:opacity-80 cursor-pointer"
                     />
                   );
@@ -212,35 +225,37 @@ export function GraficoResumoAnual({
         </div>
 
         {/* Card Lateral de Comparação e Estatísticas Expandido */}
-        <div className="lg:col-span-5 rounded-xl border border-zinc-200 bg-zinc-50/70 p-4.5 space-y-4 flex flex-col justify-between">
+        <div className="lg:col-span-5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-950/50 p-4.5 space-y-4 flex flex-col justify-between">
           <div className="space-y-1">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
               Análise Anual de Caixa
             </span>
-            <h4 className="text-sm font-bold text-zinc-900">
+            <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
               Desempenho de {nomeMesExtenso}
             </h4>
           </div>
 
-          <div className="space-y-3.5 divide-y divide-zinc-200/80">
+          <div className="space-y-3.5 divide-y divide-zinc-200/80 dark:divide-zinc-800">
             {/* Bloco 1: Saldos */}
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500 font-medium">
+                <span className="text-zinc-500 dark:text-zinc-400 font-medium">
                   Média Mensal do Saldo:
                 </span>
-                <span className="font-semibold text-zinc-800">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                   {formatarMoeda(mediaSaldoAnual)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-600 font-bold">
+                <span className="text-zinc-700 dark:text-zinc-300 font-bold">
                   Saldo de {nomeMesExtenso}:
                 </span>
                 <span
                   className={`font-bold ${
-                    itemMes.saldo >= 0 ? "text-emerald-600" : "text-red-600"
+                    itemMes.saldo >= 0
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-red-600 dark:text-red-400"
                   }`}
                 >
                   {formatarMoeda(itemMes.saldo)}
@@ -248,20 +263,20 @@ export function GraficoResumoAnual({
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Variação vs. Média:</span>
+                <span className="text-zinc-500 dark:text-zinc-400">Variação vs. Média:</span>
                 <div className="flex items-center gap-1 font-bold">
                   {difSaldo > 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-emerald-600">
+                    <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">
                       <TrendingUp className="w-3.5 h-3.5" />
                       +{pctSaldo.toFixed(1)}%
                     </span>
                   ) : difSaldo < 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-red-600">
+                    <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400">
                       <TrendingDown className="w-3.5 h-3.5" />
                       {pctSaldo.toFixed(1)}%
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-0.5 text-zinc-500">
+                    <span className="inline-flex items-center gap-0.5 text-zinc-500 dark:text-zinc-400">
                       <Minus className="w-3.5 h-3.5" />
                       0.0%
                     </span>
@@ -273,38 +288,38 @@ export function GraficoResumoAnual({
             {/* Bloco 2: Entradas */}
             <div className="space-y-2 pt-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500 font-medium">
+                <span className="text-zinc-500 dark:text-zinc-400 font-medium">
                   Média de Entradas no Ano:
                 </span>
-                <span className="font-semibold text-zinc-800">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                   {formatarMoeda(mediaEntradasAnual)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <span className="text-emerald-700 font-bold">
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold">
                   Entradas em {nomeMesExtenso}:
                 </span>
-                <span className="font-bold text-emerald-600">
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">
                   {formatarMoeda(itemMes.entradas)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Variação de Entradas:</span>
+                <span className="text-zinc-500 dark:text-zinc-400">Variação de Entradas:</span>
                 <div className="flex items-center gap-1 font-bold">
                   {difEntradas > 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-emerald-600">
+                    <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">
                       <TrendingUp className="w-3.5 h-3.5" />
                       +{pctEntradas.toFixed(1)}%
                     </span>
                   ) : difEntradas < 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-amber-600">
+                    <span className="inline-flex items-center gap-0.5 text-amber-600 dark:text-amber-400">
                       <TrendingDown className="w-3.5 h-3.5" />
                       {pctEntradas.toFixed(1)}%
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-0.5 text-zinc-500">
+                    <span className="inline-flex items-center gap-0.5 text-zinc-500 dark:text-zinc-400">
                       <Minus className="w-3.5 h-3.5" />
                       0.0%
                     </span>
@@ -316,38 +331,38 @@ export function GraficoResumoAnual({
             {/* Bloco 3: Saídas */}
             <div className="space-y-2 pt-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500 font-medium">
+                <span className="text-zinc-500 dark:text-zinc-400 font-medium">
                   Média de Saídas no Ano:
                 </span>
-                <span className="font-semibold text-zinc-800">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                   {formatarMoeda(mediaSaidasAnual)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <span className="text-red-700 font-bold">
+                <span className="text-red-700 dark:text-red-400 font-bold">
                   Saídas em {nomeMesExtenso}:
                 </span>
-                <span className="font-bold text-red-600">
+                <span className="font-bold text-red-600 dark:text-red-400">
                   {formatarMoeda(itemMes.saidas)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Variação de Saídas:</span>
+                <span className="text-zinc-500 dark:text-zinc-400">Variação de Saídas:</span>
                 <div className="flex items-center gap-1 font-bold">
                   {difSaidas > 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-red-600">
+                    <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400">
                       <TrendingUp className="w-3.5 h-3.5" />
                       +{pctSaidas.toFixed(1)}%
                     </span>
                   ) : difSaidas < 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-emerald-600">
+                    <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400">
                       <TrendingDown className="w-3.5 h-3.5" />
                       {pctSaidas.toFixed(1)}%
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-0.5 text-zinc-500">
+                    <span className="inline-flex items-center gap-0.5 text-zinc-500 dark:text-zinc-400">
                       <Minus className="w-3.5 h-3.5" />
                       0.0%
                     </span>

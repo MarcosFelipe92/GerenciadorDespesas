@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { TrendingUp } from "lucide-react";
 import { formatarMoeda } from "../../../shared/utils";
+import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 type GraficoEvolucaoMensalProps = {
   movimentacoes: TMovimentacao[];
@@ -21,6 +22,8 @@ export function GraficoEvolucaoMensal({
   movimentacoes,
   filtros,
 }: GraficoEvolucaoMensalProps) {
+  const { isDark } = useTheme();
+
   let ano = new Date().getFullYear();
   let mes = new Date().getMonth() + 1;
 
@@ -55,7 +58,8 @@ export function GraficoEvolucaoMensal({
 
   movimentacoes.forEach((mov) => {
     if (!mov.data) return;
-    const dateOnly = mov.data.split("T")[0];
+    const dateOnly = String(mov.data).split("T")[0];
+
     const [aStr, mStr, dStr] = dateOnly.split("-");
     const diaIndex = Number(dStr) - 1;
 
@@ -80,13 +84,15 @@ export function GraficoEvolucaoMensal({
     if (active && payload && payload.length) {
       const dataItem = payload[0].payload;
       return (
-        <div className="rounded-lg border border-zinc-200 bg-white p-3 shadow-md text-xs space-y-1.5">
-          <p className="font-bold text-zinc-900">Dia {dataItem.dataFormatada}</p>
-          <div className="flex items-center justify-between gap-4 text-emerald-600 font-medium">
+        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-md text-xs space-y-1.5 z-50 relative opacity-100">
+          <p className="font-bold text-zinc-900 dark:text-zinc-100">
+            Dia {dataItem.dataFormatada}
+          </p>
+          <div className="flex items-center justify-between gap-4 text-emerald-600 dark:text-emerald-400 font-medium">
             <span>Entradas:</span>
             <span>{formatarMoeda(dataItem.entradas)}</span>
           </div>
-          <div className="flex items-center justify-between gap-4 text-red-600 font-medium">
+          <div className="flex items-center justify-between gap-4 text-red-600 dark:text-red-400 font-medium">
             <span>Saídas:</span>
             <span>{formatarMoeda(dataItem.saidas)}</span>
           </div>
@@ -97,17 +103,17 @@ export function GraficoEvolucaoMensal({
   };
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm space-y-4 flex flex-col justify-between h-full">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm space-y-4 flex flex-col justify-between h-full transition-colors">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-bold text-zinc-900 tracking-tight">
+          <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
             Evolução Diária (Fluxo de Caixa)
           </h3>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Comparativo entre entradas e saídas ao longo do mês
           </p>
         </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
           <TrendingUp className="w-4 h-4" />
         </div>
       </div>
@@ -131,19 +137,19 @@ export function GraficoEvolucaoMensal({
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
-              stroke="#f4f4f5"
+              stroke={isDark ? "#27272a" : "#f4f4f5"}
             />
             <XAxis
               dataKey="dia"
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 11, fill: "#71717a" }}
+              tick={{ fontSize: 11, fill: isDark ? "#a1a1aa" : "#71717a" }}
               interval="preserveStartEnd"
             />
             <YAxis
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 11, fill: "#71717a" }}
+              tick={{ fontSize: 11, fill: isDark ? "#a1a1aa" : "#71717a" }}
               tickFormatter={(val) =>
                 val >= 1000 ? `R$ ${(val / 1000).toFixed(0)}k` : `R$ ${val}`
               }
@@ -174,14 +180,18 @@ export function GraficoEvolucaoMensal({
         </ResponsiveContainer>
       </div>
 
-      <div className="flex items-center justify-center gap-6 text-xs border-t border-zinc-100 pt-3">
+      <div className="flex items-center justify-center gap-6 text-xs border-t border-zinc-100 dark:border-zinc-800 pt-3">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-emerald-500" />
-          <span className="font-medium text-zinc-700">Entradas</span>
+          <span className="font-medium text-zinc-700 dark:text-zinc-300">
+            Entradas
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-red-500" />
-          <span className="font-medium text-zinc-700">Saídas</span>
+          <span className="font-medium text-zinc-700 dark:text-zinc-300">
+            Saídas
+          </span>
         </div>
       </div>
     </div>

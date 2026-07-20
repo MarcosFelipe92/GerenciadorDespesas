@@ -58,8 +58,8 @@ export function FormNovaMovimentacao({
       descricao: movimentacaoParaEditar ? movimentacaoParaEditar.descricao : "",
       valor: movimentacaoParaEditar
         ? Number(movimentacaoParaEditar.valor).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })
+            minimumFractionDigits: 2,
+          })
         : "",
       idCategoria: movimentacaoParaEditar ? String(movimentacaoParaEditar.idCategoria) : "",
       data: movimentacaoParaEditar
@@ -135,21 +135,23 @@ export function FormNovaMovimentacao({
       <input type="hidden" {...register("idTipo", { required: true })} />
 
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-zinc-700 tracking-wide">
+        <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 tracking-wide">
           Tipo da Movimentação
         </label>
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => setValue("idTipo", idEntrada)}
-            className={`flex items-center justify-center gap-2 h-11 rounded-lg border text-sm font-medium transition-all cursor-pointer ${idTipoSelecionado === idEntrada
-              ? "bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500 shadow-sm"
-              : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50"
-              }`}
+            className={`flex items-center justify-center gap-2 h-11 rounded-lg border text-sm font-medium transition-all cursor-pointer ${
+              idTipoSelecionado === idEntrada
+                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-500 shadow-sm"
+                : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            }`}
           >
             <ArrowUpRight
-              className={`w-4 h-4 ${idTipoSelecionado === idEntrada ? "text-green-600" : "text-zinc-400"
-                }`}
+              className={`w-4 h-4 ${
+                idTipoSelecionado === idEntrada ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-400 dark:text-zinc-500"
+              }`}
             />
             Receita / Entrada
           </button>
@@ -157,14 +159,16 @@ export function FormNovaMovimentacao({
           <button
             type="button"
             onClick={() => setValue("idTipo", idSaida)}
-            className={`flex items-center justify-center gap-2 h-11 rounded-lg border text-sm font-medium transition-all cursor-pointer ${idTipoSelecionado === idSaida
-              ? "bg-red-50 border-red-500 text-red-700 ring-1 ring-red-500 shadow-sm"
-              : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50"
-              }`}
+            className={`flex items-center justify-center gap-2 h-11 rounded-lg border text-sm font-medium transition-all cursor-pointer ${
+              idTipoSelecionado === idSaida
+                ? "bg-red-50 dark:bg-red-950/40 border-red-500 text-red-700 dark:text-red-400 ring-1 ring-red-500 shadow-sm"
+                : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            }`}
           >
             <ArrowDownLeft
-              className={`w-4 h-4 ${idTipoSelecionado === idSaida ? "text-red-600" : "text-zinc-400"
-                }`}
+              className={`w-4 h-4 ${
+                idTipoSelecionado === idSaida ? "text-red-600 dark:text-red-400" : "text-zinc-400 dark:text-zinc-500"
+              }`}
             />
             Despesa / Saída
           </button>
@@ -217,7 +221,7 @@ export function FormNovaMovimentacao({
         }
       />
 
-      <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100">
+      <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>

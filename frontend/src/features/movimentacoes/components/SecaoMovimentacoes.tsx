@@ -92,10 +92,10 @@ export function SecaoMovimentacoes({
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2">
         <div>
-          <h2 className="text-xl font-bold text-zinc-900 tracking-tight">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
             Movimentações
           </h2>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Histórico detalhado de entradas e saídas do caixa.
           </p>
         </div>
@@ -103,19 +103,19 @@ export function SecaoMovimentacoes({
         <div className="flex items-center gap-3 w-full sm:w-auto">
           {/* Campo de Busca estilo LIKE no Front */}
           <div className="relative flex-1 sm:w-64">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={termoBusca}
               onChange={(e) => setTermoBusca(e.target.value)}
               placeholder="Buscar por descrição..."
-              className="w-full pl-9 pr-8 py-2 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+              className="w-full pl-9 pr-8 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
             />
             {termoBusca && (
               <button
                 type="button"
                 onClick={() => setTermoBusca("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -154,7 +154,7 @@ export function SecaoMovimentacoes({
         mensagem={
           <span>
             Tem certeza que deseja remover a movimentação{" "}
-            <strong className="text-zinc-900 font-semibold">
+            <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">
               {movimentacaoParaExcluir?.descricao}
             </strong>
             ? Esta ação não poderá ser desfeita.

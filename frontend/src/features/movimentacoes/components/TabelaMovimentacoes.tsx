@@ -14,9 +14,9 @@ export function TabelaMovimentacoes({
   onExcluir,
 }: TabelaMovimentacoesProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <table className="w-full border-collapse text-left text-sm text-gray-600">
-        <thead className="bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+    <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm transition-colors">
+      <table className="w-full border-collapse text-left text-sm text-zinc-600 dark:text-zinc-300">
+        <thead className="bg-zinc-50 dark:bg-zinc-950/50 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
           <tr>
             <th className="px-6 py-4">Descrição / Categoria</th>
             <th className="px-6 py-4">Tipo</th>
@@ -29,10 +29,10 @@ export function TabelaMovimentacoes({
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
           {movimentacoes.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
+              <td colSpan={5} className="px-6 py-8 text-center text-zinc-400 dark:text-zinc-500">
                 Nenhuma movimentação cadastrada.
               </td>
             </tr>
@@ -43,16 +43,16 @@ export function TabelaMovimentacoes({
               return (
                 <tr
                   key={mov.id}
-                  className="hover:bg-gray-50/75 transition-colors"
+                  className="hover:bg-zinc-50/75 dark:hover:bg-zinc-800/40 transition-colors"
                 >
                   {/* Coluna: Descrição + Categoria */}
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
                         {mov.descricao}
                       </span>
                       {mov.categoria && (
-                        <span className="mt-0.5 text-xs text-gray-400">
+                        <span className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
                           {mov.categoria.descricao}
                         </span>
                       )}
@@ -62,23 +62,27 @@ export function TabelaMovimentacoes({
                   <td className="px-6 py-4 alignment-middle">
                     {mov.tipo && (
                       <span
-                        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${isEntrada
-                          ? "bg-green-50 text-green-700 ring-green-600/20"
-                          : "bg-red-50 text-red-700 ring-red-600/20"
-                          }`}
+                        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
+                          isEntrada
+                            ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 ring-emerald-600/20 dark:ring-emerald-500/30"
+                            : "bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 ring-red-600/20 dark:ring-red-500/30"
+                        }`}
                       >
                         {mov.tipo.descricao}
                       </span>
                     )}
                   </td>
                   {/* Coluna: Data */}
-                  <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                  <td className="px-6 py-4 text-zinc-600 dark:text-zinc-300 whitespace-nowrap">
                     {formatarData(mov.data)}
                   </td>
                   {/* Coluna: Valor */}
                   <td
-                    className={`px-6 py-4 text-right font-semibold whitespace-nowrap ${isEntrada ? "text-green-600" : "text-red-600"
-                      }`}
+                    className={`px-6 py-4 text-right font-semibold whitespace-nowrap ${
+                      isEntrada
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-red-600 dark:text-red-400"
+                    }`}
                   >
                     {isEntrada ? "+ " : "- "}
                     {Number(mov.valor).toLocaleString("pt-BR", {

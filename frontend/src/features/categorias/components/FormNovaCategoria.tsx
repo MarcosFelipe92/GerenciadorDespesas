@@ -72,7 +72,7 @@ export function FormNovaCategoria({
         })}
       />
 
-      <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100">
+      <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>

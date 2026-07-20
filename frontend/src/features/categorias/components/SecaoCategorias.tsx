@@ -76,10 +76,10 @@ export function SecaoCategorias({
     <div className="space-y-4">
       <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-xl font-bold text-zinc-900 tracking-tight">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
             Categorias
           </h2>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Gerenciamento de categorias do sistema.
           </p>
         </div>
@@ -113,7 +113,7 @@ export function SecaoCategorias({
         mensagem={
           <span>
             Tem certeza que deseja remover a categoria{" "}
-            <strong className="text-zinc-900 font-semibold">
+            <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">
               {categoriaParaExcluir?.descricao}
             </strong>
             ? Esta ação não poderá ser desfeita.

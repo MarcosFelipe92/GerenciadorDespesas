@@ -18,9 +18,9 @@ export function ModalNovaCategoria({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-xl border border-zinc-200 bg-white p-6 shadow-lg">
-        <h3 className="text-lg font-bold text-zinc-900 mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+      <div className="w-full max-w-lg rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xl space-y-4 text-zinc-900 dark:text-zinc-100">
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
           {categoriaParaEditar ? "Editar Categoria" : "Adicionar Categoria"}
         </h3>
 
