@@ -58,28 +58,63 @@ export function GraficoResumoAnual({
     nomeMes: NOMES_CURTOS_MESES[item.mes - 1] || `${item.mes}`,
   }));
 
-  const somaSaldoAnual = resumoAnual.reduce((acc, item) => acc + item.saldo, 0);
-  const mediaMensalAnual =
-    resumoAnual.length > 0 ? somaSaldoAnual / resumoAnual.length : 0;
+  // Filtrar apenas meses que possuem movimentações (entradas ou saídas)
+  const mesesComAtividade = resumoAnual.filter(
+    (item) => item.entradas > 0 || item.saidas > 0,
+  );
+  const qtdMesesComAtividade = mesesComAtividade.length || 1;
 
-  const itemMesSelecionado = resumoAnual.find(
-    (item) => item.mes === mesSelecionado,
-  ) || {
+  // 1. Médias Anuais (baseadas nos meses ativos do ano)
+  const somaSaldoAnual = mesesComAtividade.reduce(
+    (acc, item) => acc + item.saldo,
+    0,
+  );
+  const mediaSaldoAnual = somaSaldoAnual / qtdMesesComAtividade;
+
+  const somaEntradasAnual = mesesComAtividade.reduce(
+    (acc, item) => acc + item.entradas,
+    0,
+  );
+  const mediaEntradasAnual = somaEntradasAnual / qtdMesesComAtividade;
+
+  const somaSaidasAnual = mesesComAtividade.reduce(
+    (acc, item) => acc + item.saidas,
+    0,
+  );
+  const mediaSaidasAnual = somaSaidasAnual / qtdMesesComAtividade;
+
+  // 2. Mês Selecionado
+  const itemMes = resumoAnual.find((item) => item.mes === mesSelecionado) || {
     mes: mesSelecionado,
     entradas: 0,
     saidas: 0,
     saldo: 0,
   };
 
-  const saldoMesAtual = itemMesSelecionado.saldo;
-  const diferencaComMedia = saldoMesAtual - mediaMensalAnual;
-  const percentualVariacao =
-    mediaMensalAnual !== 0
-      ? (diferencaComMedia / Math.abs(mediaMensalAnual)) * 100
-      : 0;
-
   const nomeMesExtenso =
     NOMES_EXTENSOS_MESES[mesSelecionado - 1] || `Mês ${mesSelecionado}`;
+
+  // 3. Variações vs Média
+  // Saldo
+  const difSaldo = itemMes.saldo - mediaSaldoAnual;
+  const pctSaldo =
+    mediaSaldoAnual !== 0
+      ? (difSaldo / Math.abs(mediaSaldoAnual)) * 100
+      : 0;
+
+  // Entradas
+  const difEntradas = itemMes.entradas - mediaEntradasAnual;
+  const pctEntradas =
+    mediaEntradasAnual !== 0
+      ? (difEntradas / mediaEntradasAnual) * 100
+      : 0;
+
+  // Saídas
+  const difSaidas = itemMes.saidas - mediaSaidasAnual;
+  const pctSaidas =
+    mediaSaidasAnual !== 0
+      ? (difSaidas / mediaSaidasAnual) * 100
+      : 0;
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -127,9 +162,9 @@ export function GraficoResumoAnual({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center pt-2">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pt-2">
         {/* Gráfico de Barras dos 12 meses */}
-        <div className="lg:col-span-8 h-64 w-full">
+        <div className="lg:col-span-7 h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
@@ -176,70 +211,148 @@ export function GraficoResumoAnual({
           </ResponsiveContainer>
         </div>
 
-        {/* Card Lateral de Comparação e Estatísticas */}
-        <div className="lg:col-span-4 rounded-xl border border-zinc-200 bg-zinc-50/60 p-4 space-y-4 flex flex-col justify-center h-full">
+        {/* Card Lateral de Comparação e Estatísticas Expandido */}
+        <div className="lg:col-span-5 rounded-xl border border-zinc-200 bg-zinc-50/70 p-4.5 space-y-4 flex flex-col justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
               Análise Anual de Caixa
             </span>
-            <h4 className="text-sm font-bold text-zinc-800">
+            <h4 className="text-sm font-bold text-zinc-900">
               Desempenho de {nomeMesExtenso}
             </h4>
           </div>
 
-          <div className="space-y-3 divide-y divide-zinc-200/60">
-            {/* Média Mensal Anual */}
-            <div className="pt-1 flex items-center justify-between text-xs">
-              <span className="text-zinc-600 font-medium">
-                Média Anual do Saldo:
-              </span>
-              <span className="font-bold text-zinc-900">
-                {formatarMoeda(mediaMensalAnual)}
-              </span>
-            </div>
-
-            {/* Saldo do Mês Selecionado */}
-            <div className="pt-3 flex items-center justify-between text-xs">
-              <span className="text-zinc-600 font-medium">
-                Saldo de {nomeMesExtenso}:
-              </span>
-              <span
-                className={`font-bold ${
-                  saldoMesAtual >= 0 ? "text-emerald-600" : "text-red-600"
-                }`}
-              >
-                {formatarMoeda(saldoMesAtual)}
-              </span>
-            </div>
-
-            {/* Variação em relação à média */}
-            <div className="pt-3 space-y-1.5">
+          <div className="space-y-3.5 divide-y divide-zinc-200/80">
+            {/* Bloco 1: Saldos */}
+            <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-600 font-medium">
-                  Variação vs. Média:
+                <span className="text-zinc-500 font-medium">
+                  Média Mensal do Saldo:
                 </span>
-                <span className="font-bold text-zinc-900">
-                  {formatarMoeda(diferencaComMedia)}
+                <span className="font-semibold text-zinc-800">
+                  {formatarMoeda(mediaSaldoAnual)}
                 </span>
               </div>
 
-              <div className="flex items-center justify-end">
-                {diferencaComMedia > 0 ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
-                    <TrendingUp className="w-3 h-3" />
-                    +{percentualVariacao.toFixed(1)}% acima da média
-                  </span>
-                ) : diferencaComMedia < 0 ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-bold text-red-700">
-                    <TrendingDown className="w-3 h-3" />
-                    {percentualVariacao.toFixed(1)}% abaixo da média
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px] font-bold text-zinc-700">
-                    <Minus className="w-3 h-3" />
-                    Na média anual
-                  </span>
-                )}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-600 font-bold">
+                  Saldo de {nomeMesExtenso}:
+                </span>
+                <span
+                  className={`font-bold ${
+                    itemMes.saldo >= 0 ? "text-emerald-600" : "text-red-600"
+                  }`}
+                >
+                  {formatarMoeda(itemMes.saldo)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-500">Variação vs. Média:</span>
+                <div className="flex items-center gap-1 font-bold">
+                  {difSaldo > 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-emerald-600">
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      +{pctSaldo.toFixed(1)}%
+                    </span>
+                  ) : difSaldo < 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-red-600">
+                      <TrendingDown className="w-3.5 h-3.5" />
+                      {pctSaldo.toFixed(1)}%
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-0.5 text-zinc-500">
+                      <Minus className="w-3.5 h-3.5" />
+                      0.0%
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Bloco 2: Entradas */}
+            <div className="space-y-2 pt-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-500 font-medium">
+                  Média de Entradas no Ano:
+                </span>
+                <span className="font-semibold text-zinc-800">
+                  {formatarMoeda(mediaEntradasAnual)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-emerald-700 font-bold">
+                  Entradas em {nomeMesExtenso}:
+                </span>
+                <span className="font-bold text-emerald-600">
+                  {formatarMoeda(itemMes.entradas)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-500">Variação de Entradas:</span>
+                <div className="flex items-center gap-1 font-bold">
+                  {difEntradas > 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-emerald-600">
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      +{pctEntradas.toFixed(1)}%
+                    </span>
+                  ) : difEntradas < 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-amber-600">
+                      <TrendingDown className="w-3.5 h-3.5" />
+                      {pctEntradas.toFixed(1)}%
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-0.5 text-zinc-500">
+                      <Minus className="w-3.5 h-3.5" />
+                      0.0%
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Bloco 3: Saídas */}
+            <div className="space-y-2 pt-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-500 font-medium">
+                  Média de Saídas no Ano:
+                </span>
+                <span className="font-semibold text-zinc-800">
+                  {formatarMoeda(mediaSaidasAnual)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-red-700 font-bold">
+                  Saídas em {nomeMesExtenso}:
+                </span>
+                <span className="font-bold text-red-600">
+                  {formatarMoeda(itemMes.saidas)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-500">Variação de Saídas:</span>
+                <div className="flex items-center gap-1 font-bold">
+                  {difSaidas > 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-red-600">
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      +{pctSaidas.toFixed(1)}%
+                    </span>
+                  ) : difSaidas < 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-emerald-600">
+                      <TrendingDown className="w-3.5 h-3.5" />
+                      {pctSaidas.toFixed(1)}%
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-0.5 text-zinc-500">
+                      <Minus className="w-3.5 h-3.5" />
+                      0.0%
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
