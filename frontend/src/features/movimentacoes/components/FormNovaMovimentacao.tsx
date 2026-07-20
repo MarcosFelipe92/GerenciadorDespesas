@@ -35,7 +35,7 @@ export function FormNovaMovimentacao({
   movimentacaoParaEditar,
 }: FormNovaMovimentacaoProps) {
   const opcoesCategorias = categorias.map((cat) => ({
-    value: cat.id,
+    value: String(cat.id),
     label: cat.descricao,
   }));
 
@@ -143,8 +143,8 @@ export function FormNovaMovimentacao({
             type="button"
             onClick={() => setValue("idTipo", idEntrada)}
             className={`flex items-center justify-center gap-2 h-11 rounded-lg border text-sm font-medium transition-all cursor-pointer ${idTipoSelecionado === idEntrada
-                ? "bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500 shadow-sm"
-                : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+              ? "bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500 shadow-sm"
+              : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50"
               }`}
           >
             <ArrowUpRight
@@ -158,8 +158,8 @@ export function FormNovaMovimentacao({
             type="button"
             onClick={() => setValue("idTipo", idSaida)}
             className={`flex items-center justify-center gap-2 h-11 rounded-lg border text-sm font-medium transition-all cursor-pointer ${idTipoSelecionado === idSaida
-                ? "bg-red-50 border-red-500 text-red-700 ring-1 ring-red-500 shadow-sm"
-                : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+              ? "bg-red-50 border-red-500 text-red-700 ring-1 ring-red-500 shadow-sm"
+              : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50"
               }`}
           >
             <ArrowDownLeft

@@ -1,4 +1,4 @@
 export type TCategoria = {
-  id: string;
+  id: number;
   descricao: string;
 };
