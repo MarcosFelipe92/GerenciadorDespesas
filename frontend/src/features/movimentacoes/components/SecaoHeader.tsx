@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { TMovimentacao } from "../../../types/movimentacoes.types";
+import { formatarMoeda } from "../../../shared/utils";
 import {
   Calendar,
   ChevronLeft,
@@ -75,13 +76,6 @@ export function SecaoHeader({
 
   const saldoPeriodo = entradas - saidas;
   const saldoFinal = saldoAnterior + saldoPeriodo;
-
-  const formatarMoeda = (valor: number) => {
-    return valor.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-  };
 
   return (
     <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm space-y-6">

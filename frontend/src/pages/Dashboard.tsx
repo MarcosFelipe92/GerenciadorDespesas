@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { SecaoHeader } from "../features/movimentacoes/components/SecaoHeader";
+import { SecaoGraficos } from "../features/movimentacoes/components/SecaoGraficos";
 import { SecaoMovimentacoes } from "../features/movimentacoes/components/SecaoMovimentacoes";
 import { movimentacoesApi } from "../features/movimentacoes/api";
 import type {
@@ -93,6 +94,8 @@ export default function Dashboard() {
         saldoAnterior={saldoAnterior}
         onFilterChange={handleFilterChange}
       />
+
+      <SecaoGraficos movimentacoes={movimentacoes} filtros={filtros} />
 
       <SecaoMovimentacoes
         movimentacoes={movimentacoes}
