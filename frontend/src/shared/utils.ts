@@ -19,3 +19,11 @@ export function formatPhoneNumber(value: string): string {
     return `${limited.slice(0, 2)} ${limited.slice(2, 7)}-${limited.slice(7)}`;
   }
 }
+
+export function formatarData(dataStr: string) {
+  if (!dataStr) return "-";
+  const dateOnly = dataStr.split("T")[0];
+  const [ano, mes, dia] = dateOnly.split("-");
+  if (!ano || !mes || !dia) return dataStr;
+  return `${dia}/${mes}/${ano}`;
+};

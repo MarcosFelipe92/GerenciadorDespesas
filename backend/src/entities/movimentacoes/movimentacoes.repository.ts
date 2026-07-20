@@ -1,12 +1,38 @@
+import { Op } from "sequelize";
 import db from "../../database/models/index";
 
 import Movimentacoes, {
   IMovimentacoes,
 } from "../../database/models/movimentacoes.model";
 
+export type TFiltrosMovimentacao = {
+  dataInicio?: string;
+  dataFim?: string;
+};
+
 export class MovimentacoesRepository {
-  async getAll(): Promise<Movimentacoes[]> {
+  async getAll(filtros?: TFiltrosMovimentacao): Promise<Movimentacoes[]> {
+    const where: any = {};
+
+    const dataFilter: any = {};
+
+    if (filtros?.dataInicio) {
+      dataFilter[Op.gte] = filtros.dataInicio;
+    }
+
+    if (filtros?.dataFim) {
+      dataFilter[Op.lte] = filtros.dataFim;
+    }
+
+    if (
+      Object.keys(dataFilter).length > 0 ||
+      Object.getOwnPropertySymbols(dataFilter).length > 0
+    ) {
+      where.data = dataFilter;
+    }
+
     return db.Movimentacoes.findAll({
+      where,
       include: [
         { model: db.Categorias, as: "categoria" },
         { model: db.Tipos, as: "tipo" },

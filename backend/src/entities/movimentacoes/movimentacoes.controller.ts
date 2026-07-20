@@ -10,8 +10,31 @@ export class MovimentacoesController {
 
   getAll = async (req: Request, res: Response): Promise<void> => {
     try {
-      const result = await this.movimentacoesService.getAll();
+      const { dataInicio, dataFim } = req.query;
+      const filtros = {
+        dataInicio: typeof dataInicio === "string" ? dataInicio : undefined,
+        dataFim: typeof dataFim === "string" ? dataFim : undefined,
+      };
+
+      const result = await this.movimentacoesService.getAll(filtros);
       res.status(200).json(result);
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ error: error.message || "Erro interno do servidor" });
+    }
+  };
+
+  getSaldoAnterior = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { dataInicio } = req.query;
+      const dataInicioStr =
+        typeof dataInicio === "string" ? dataInicio : undefined;
+
+      const saldo =
+        await this.movimentacoesService.getSaldoAnterior(dataInicioStr);
+
+      res.status(200).json({ saldoAnterior: saldo });
     } catch (error: any) {
       res
         .status(500)

@@ -34,6 +34,7 @@ const tiposService = new TiposService(tiposRepository);
 const tiposController = new TiposController(tiposService);
 
 app.get("/movimentacoes", movimentacoesController.getAll);
+app.get("/movimentacoes/saldo-anterior", movimentacoesController.getSaldoAnterior);
 app.get("/movimentacoes/:id", movimentacoesController.getById);
 app.post("/movimentacoes", movimentacoesController.bulkCreate);
 app.put("/movimentacoes/:id", movimentacoesController.update);

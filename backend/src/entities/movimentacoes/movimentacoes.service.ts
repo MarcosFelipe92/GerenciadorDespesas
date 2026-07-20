@@ -2,7 +2,10 @@ import Movimentacoes, {
   IMovimentacoes,
 } from "../../database/models/movimentacoes.model";
 
-import { MovimentacoesRepository } from "./movimentacoes.repository";
+import {
+  MovimentacoesRepository,
+  TFiltrosMovimentacao,
+} from "./movimentacoes.repository";
 
 export class MovimentacoesService {
   private movimentacoesRepository: MovimentacoesRepository;
@@ -11,8 +14,40 @@ export class MovimentacoesService {
     this.movimentacoesRepository = movimentacoesRepository;
   }
 
-  async getAll(): Promise<Movimentacoes[]> {
-    return this.movimentacoesRepository.getAll();
+  async getAll(filtros?: TFiltrosMovimentacao): Promise<Movimentacoes[]> {
+    return this.movimentacoesRepository.getAll(filtros);
+  }
+
+  async getSaldoAnterior(dataInicio?: string): Promise<number> {
+    if (!dataInicio) return 0;
+
+    const [anoStr, mesStr, diaStr] = dataInicio.split("-");
+    const ano = Number(anoStr);
+    const mes = Number(mesStr);
+    const dia = Number(diaStr);
+
+    if (isNaN(ano) || isNaN(mes) || isNaN(dia)) return 0;
+
+    const dataRef = new Date(Date.UTC(ano, mes - 1, dia));
+    dataRef.setUTCDate(dataRef.getUTCDate() - 1);
+    const dataFimAnterior = dataRef.toISOString().split("T")[0];
+
+    const movimentacoesAnteriores = await this.movimentacoesRepository.getAll({
+      dataFim: dataFimAnterior,
+    });
+
+    let saldo = 0;
+    for (const mov of movimentacoesAnteriores) {
+      const isEntrada = mov.tipo?.descricao === "Entrada" || mov.idTipo === 1;
+      const valorNum = Number(mov.valor) || 0;
+      if (isEntrada) {
+        saldo += valorNum;
+      } else {
+        saldo -= valorNum;
+      }
+    }
+
+    return saldo;
   }
 
   async getById(id: number): Promise<Movimentacoes | null> {

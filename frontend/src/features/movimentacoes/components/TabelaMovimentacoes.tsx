@@ -1,5 +1,6 @@
 import type { TMovimentacao } from "../../../types/movimentacoes.types";
 import { Button } from "../../../shared/components/Button";
+import { formatarData } from "../../../shared/utils";
 
 type TabelaMovimentacoesProps = {
   movimentacoes: TMovimentacao[];
@@ -19,6 +20,7 @@ export function TabelaMovimentacoes({
           <tr>
             <th className="px-6 py-4">Descrição / Categoria</th>
             <th className="px-6 py-4">Tipo</th>
+            <th className="px-6 py-4">Data</th>
             <th className="px-6 py-4 text-right">Valor</th>
             <th className="px-6 py-4">
               <div className="flex justify-end">
@@ -28,73 +30,85 @@ export function TabelaMovimentacoes({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {movimentacoes.map((mov) => {
-            const isEntrada = mov.tipo?.descricao === "Entrada";
+          {movimentacoes.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
+                Nenhuma movimentação cadastrada.
+              </td>
+            </tr>
+          ) : (
+            movimentacoes.map((mov) => {
+              const isEntrada = mov.tipo?.descricao === "Entrada";
 
-            return (
-              <tr
-                key={mov.id}
-                className="hover:bg-gray-50/75 transition-colors"
-              >
-                {/* Coluna: Descrição + Categoria */}
-                <td className="px-6 py-4">
-                  <div className="flex flex-col">
-                    <span className="font-medium text-gray-900">
-                      {mov.descricao}
-                    </span>
-                    {mov.categoria && (
-                      <span className="mt-0.5 text-xs text-gray-400">
-                        {mov.categoria.descricao}
+              return (
+                <tr
+                  key={mov.id}
+                  className="hover:bg-gray-50/75 transition-colors"
+                >
+                  {/* Coluna: Descrição + Categoria */}
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-900">
+                        {mov.descricao}
                       </span>
-                    )}
-                  </div>
-                </td>
-                {/* Coluna: Tipo (Badge Estilizado) */}
-                <td className="px-6 py-4 alignment-middle">
-                  {mov.tipo && (
-                    <span
-                      className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${isEntrada
+                      {mov.categoria && (
+                        <span className="mt-0.5 text-xs text-gray-400">
+                          {mov.categoria.descricao}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  {/* Coluna: Tipo (Badge Estilizado) */}
+                  <td className="px-6 py-4 alignment-middle">
+                    {mov.tipo && (
+                      <span
+                        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${isEntrada
                           ? "bg-green-50 text-green-700 ring-green-600/20"
                           : "bg-red-50 text-red-700 ring-red-600/20"
-                        }`}
-                    >
-                      {mov.tipo.descricao}
-                    </span>
-                  )}
-                </td>
-                {/* Coluna: Valor */}
-                <td
-                  className={`px-6 py-4 text-right font-semibold ${isEntrada ? "text-green-600" : "text-red-600"
-                    }`}
-                >
-                  {isEntrada ? "+ " : "- "}
-                  {Number(mov.valor).toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </td>
+                          }`}
+                      >
+                        {mov.tipo.descricao}
+                      </span>
+                    )}
+                  </td>
+                  {/* Coluna: Data */}
+                  <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                    {formatarData(mov.data)}
+                  </td>
+                  {/* Coluna: Valor */}
+                  <td
+                    className={`px-6 py-4 text-right font-semibold whitespace-nowrap ${isEntrada ? "text-green-600" : "text-red-600"
+                      }`}
+                  >
+                    {isEntrada ? "+ " : "- "}
+                    {Number(mov.valor).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </td>
 
-                <td className="px-6 py-4">
-                  <div className="flex justify-end items-center gap-2">
-                    <Button 
-                      variant="red" 
-                      className="w-24"
-                      onClick={() => onExcluir(mov.id)}
-                    >
-                      Remover
-                    </Button>
-                    <Button 
-                      variant="amber" 
-                      className="w-24"
-                      onClick={() => onEditar(mov)}
-                    >
-                      Editar
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
+                  <td className="px-6 py-4">
+                    <div className="flex justify-end items-center gap-2">
+                      <Button
+                        variant="red"
+                        className="w-24"
+                        onClick={() => onExcluir(mov.id)}
+                      >
+                        Remover
+                      </Button>
+                      <Button
+                        variant="amber"
+                        className="w-24"
+                        onClick={() => onEditar(mov)}
+                      >
+                        Editar
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
+          )}
         </tbody>
       </table>
     </div>

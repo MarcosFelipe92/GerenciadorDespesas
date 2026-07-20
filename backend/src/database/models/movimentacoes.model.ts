@@ -18,6 +18,8 @@ class Movimentacoes extends Model<IMovimentacoes> implements IMovimentacoes {
   declare paga: boolean;
   declare idTipo: number;
   declare idCategoria: number;
+  declare tipo?: any;
+  declare categoria?: any;
 
   public static associar(models: any) {
     this.belongsTo(models.Tipos, {
