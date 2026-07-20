@@ -1,7 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { SecaoHeader } from "../features/movimentacoes/components/SecaoHeader";
+import { SecaoGraficos } from "../features/movimentacoes/components/SecaoGraficos";
 import { SecaoMovimentacoes } from "../features/movimentacoes/components/SecaoMovimentacoes";
 import { movimentacoesApi } from "../features/movimentacoes/api";
-import type { TCreateMovimentacaoPayload } from "../features/movimentacoes/api";
+import type {
+  TCreateMovimentacaoPayload,
+  TMovimentacaoFiltros,
+  TResumoMensal,
+} from "../features/movimentacoes/api";
 import { categoriasApi } from "../features/categorias/api";
 import type { TMovimentacao } from "../types/movimentacoes.types";
 import type { TCategoria } from "../types/categorias.types";
@@ -12,26 +18,15 @@ export default function Dashboard() {
   const [movimentacoes, setMovimentacoes] = useState<TMovimentacao[]>([]);
   const [categorias, setCategorias] = useState<TCategoria[]>([]);
   const [tipos, setTipos] = useState<TTipo[]>([]);
+  const [saldoAnterior, setSaldoAnterior] = useState<number>(0);
+  const [resumoAnual, setResumoAnual] = useState<TResumoMensal[]>([]);
+  const [filtros, setFiltros] = useState<TMovimentacaoFiltros | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
 
-  const carregarMovimentacoes = async () => {
-    try {
-      const dadosMov = await movimentacoesApi.getAll();
-      setMovimentacoes(dadosMov);
-    } catch (err: any) {
-      setErro(err.message);
-    }
-  };
-
   useEffect(() => {
-    Promise.all([
-      movimentacoesApi.getAll(),
-      categoriasApi.getAll(),
-      tiposApi.getAll(),
-    ])
-      .then(([dadosMov, dadosCat, dadosTip]) => {
-        setMovimentacoes(dadosMov);
+    Promise.all([categoriasApi.getAll(), tiposApi.getAll()])
+      .then(([dadosCat, dadosTip]) => {
         setCategorias(dadosCat);
         setTipos(dadosTip);
       })
@@ -39,27 +34,73 @@ export default function Dashboard() {
       .finally(() => setCarregando(false));
   }, []);
 
-  const handleCreateMovimentacao = async (payload: TCreateMovimentacaoPayload) => {
-    await movimentacoesApi.create(payload);
-    await carregarMovimentacoes();
+  const carregarDadosFiltrados = useCallback(
+    async (novosFiltros: TMovimentacaoFiltros) => {
+      try {
+        const [aStr] = (novosFiltros.dataInicio || "").split("-");
+        const anoParam = Number(aStr) || new Date().getFullYear();
+
+        const [dadosMov, saldo, resumo] = await Promise.all([
+          movimentacoesApi.getAll(novosFiltros),
+          movimentacoesApi.getSaldoAnterior(novosFiltros.dataInicio),
+          movimentacoesApi.getResumoAnual(anoParam),
+        ]);
+        setMovimentacoes(dadosMov);
+        setSaldoAnterior(saldo);
+        setResumoAnual(resumo);
+      } catch (err: any) {
+        setErro(err.message || "Erro ao carregar movimentações");
+      }
+    },
+    [],
+  );
+
+  const handleFilterChange = (novosFiltros: TMovimentacaoFiltros) => {
+    setFiltros(novosFiltros);
+    carregarDadosFiltrados(novosFiltros);
   };
 
-  const handleUpdateMovimentacao = async (id: number, payload: Partial<TCreateMovimentacaoPayload>) => {
+  const recarregarAtual = async () => {
+    if (filtros) {
+      await carregarDadosFiltrados(filtros);
+    }
+  };
+
+  const handleCreateMovimentacao = async (
+    payload: TCreateMovimentacaoPayload,
+  ) => {
+    await movimentacoesApi.create(payload);
+    await recarregarAtual();
+  };
+
+  const handleUpdateMovimentacao = async (
+    id: number,
+    payload: Partial<TCreateMovimentacaoPayload>,
+  ) => {
     await movimentacoesApi.update(id, payload);
-    await carregarMovimentacoes();
+    await recarregarAtual();
   };
 
   const handleDeleteMovimentacao = async (id: number) => {
-    const confirmar = window.confirm("Deseja realmente remover esta movimentação?");
-    if (!confirmar) return;
-
     try {
       await movimentacoesApi.delete(id);
-      await carregarMovimentacoes();
+      await recarregarAtual();
     } catch (err: any) {
       alert(err.message || "Erro ao excluir movimentação");
     }
   };
+
+  const hoje = new Date();
+  let anoSelecionado = hoje.getFullYear();
+  let mesSelecionado = hoje.getMonth() + 1;
+
+  if (filtros?.dataInicio) {
+    const [a, m] = filtros.dataInicio.split("-").map(Number);
+    if (!isNaN(a) && !isNaN(m)) {
+      anoSelecionado = a;
+      mesSelecionado = m;
+    }
+  }
 
   if (erro) return <div className="p-6 text-red-500">Erro: {erro}</div>;
   if (carregando)
@@ -67,9 +108,19 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="h-48 bg-zinc-100 rounded-xl border border-dashed flex items-center justify-center text-zinc-400">
-        [Área dos Gráficos]
-      </div>
+      <SecaoHeader
+        movimentacoes={movimentacoes}
+        saldoAnterior={saldoAnterior}
+        onFilterChange={handleFilterChange}
+      />
+
+      <SecaoGraficos
+        movimentacoes={movimentacoes}
+        filtros={filtros}
+        resumoAnual={resumoAnual}
+        mesSelecionado={mesSelecionado}
+        anoSelecionado={anoSelecionado}
+      />
 
       <SecaoMovimentacoes
         movimentacoes={movimentacoes}

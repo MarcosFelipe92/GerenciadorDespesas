@@ -1,20 +1,21 @@
 // App.tsx ou main.tsx
-import { createBrowserRouter, RouterProvider } from 'react-router';
-import { LayoutPrincipal } from './layouts/LayoutPrincipal';
-import Dashboard from './pages/Dashboard';
-import { Categorias } from './pages/Categorias';
+import { createBrowserRouter, RouterProvider } from "react-router";
+import { LayoutPrincipal } from "./layouts/LayoutPrincipal";
+import Dashboard from "./pages/Dashboard";
+import { Categorias } from "./pages/Categorias";
+import { ThemeProvider } from "./shared/contexts/ThemeContext";
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <LayoutPrincipal />,
     children: [
       {
-        path: '/',
+        path: "/",
         element: <Dashboard />,
       },
       {
-        path: '/categorias',
+        path: "/categorias",
         element: <Categorias />,
       },
     ],
@@ -22,5 +23,9 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
+  );
 }

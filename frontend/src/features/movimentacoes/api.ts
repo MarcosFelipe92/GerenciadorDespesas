@@ -1,5 +1,17 @@
 import type { TMovimentacao } from "../../types/movimentacoes.types";
 
+export type TMovimentacaoFiltros = {
+  dataInicio?: string;
+  dataFim?: string;
+};
+
+export type TResumoMensal = {
+  mes: number;
+  entradas: number;
+  saidas: number;
+  saldo: number;
+};
+
 export type TCreateMovimentacaoPayload = {
   descricao: string;
   valor: number;
@@ -12,10 +24,34 @@ export type TCreateMovimentacaoPayload = {
 const API_URL = "http://localhost:8080/movimentacoes";
 
 export const movimentacoesApi = {
-  getAll: async (): Promise<TMovimentacao[]> => {
-    const res = await fetch(API_URL);
+  getAll: async (filtros?: TMovimentacaoFiltros): Promise<TMovimentacao[]> => {
+    const params = new URLSearchParams();
+    if (filtros?.dataInicio) params.append("dataInicio", filtros.dataInicio);
+    if (filtros?.dataFim) params.append("dataFim", filtros.dataFim);
+
+    const url = params.toString() ? `${API_URL}?${params.toString()}` : API_URL;
+    const res = await fetch(url);
 
     if (!res.ok) throw new Error("Erro ao buscar movimentações");
+    return res.json();
+  },
+
+  getSaldoAnterior: async (dataInicio?: string): Promise<number> => {
+    if (!dataInicio) return 0;
+    const url = `${API_URL}/saldo-anterior?dataInicio=${encodeURIComponent(dataInicio)}`;
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error("Erro ao buscar saldo anterior");
+    const data = await res.json();
+    return data.saldoAnterior || 0;
+  },
+
+  getResumoAnual: async (ano?: number): Promise<TResumoMensal[]> => {
+    const anoParam = ano || new Date().getFullYear();
+    const url = `${API_URL}/resumo-anual?ano=${anoParam}`;
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error("Erro ao buscar resumo anual");
     return res.json();
   },
 
@@ -67,4 +103,3 @@ export const movimentacoesApi = {
     }
   },
 };
-
