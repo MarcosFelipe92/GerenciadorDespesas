@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TabelaMovimentacoes } from "./TabelaMovimentacoes";
 import { ModalNovaMovimentacao } from "./ModalNovaMovimentacao";
+import { ModalConfirmacao } from "../../../shared/components/ModalConfirmacao";
 import { Button } from "../../../shared/components/Button";
 import { Plus } from "lucide-react";
 import type { TMovimentacao } from "../../../types/movimentacoes.types";
@@ -13,7 +14,10 @@ type SecaoMovimentacoesProps = {
   categorias: TCategoria[];
   tipos: TTipo[];
   onCreate: (payload: TCreateMovimentacaoPayload) => Promise<void>;
-  onEditar: (id: number, payload: Partial<TCreateMovimentacaoPayload>) => Promise<void>;
+  onEditar: (
+    id: number,
+    payload: Partial<TCreateMovimentacaoPayload>,
+  ) => Promise<void>;
   onExcluir: (id: number) => Promise<void>;
 };
 
@@ -26,7 +30,12 @@ export function SecaoMovimentacoes({
   onExcluir,
 }: SecaoMovimentacoesProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [movimentacaoParaEditar, setMovimentacaoParaEditar] = useState<TMovimentacao | undefined>(undefined);
+  const [movimentacaoParaEditar, setMovimentacaoParaEditar] = useState<
+    TMovimentacao | undefined
+  >(undefined);
+  const [movimentacaoParaExcluir, setMovimentacaoParaExcluir] =
+    useState<TMovimentacao | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
 
   const handleOpenNewModal = () => {
     setMovimentacaoParaEditar(undefined);
@@ -41,6 +50,24 @@ export function SecaoMovimentacoes({
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setMovimentacaoParaEditar(undefined);
+  };
+
+  const handleOpenExcluirModal = (id: number) => {
+    const mov = movimentacoes.find((m) => m.id === id);
+    if (mov) {
+      setMovimentacaoParaExcluir(mov);
+    }
+  };
+
+  const handleConfirmarExclusao = async () => {
+    if (!movimentacaoParaExcluir) return;
+    try {
+      setExcluindo(true);
+      await onExcluir(movimentacaoParaExcluir.id);
+      setMovimentacaoParaExcluir(null);
+    } finally {
+      setExcluindo(false);
+    }
   };
 
   const handleSubmit = async (payload: TCreateMovimentacaoPayload) => {
@@ -76,7 +103,7 @@ export function SecaoMovimentacoes({
       <TabelaMovimentacoes
         movimentacoes={movimentacoes}
         onEditar={handleOpenEditModal}
-        onExcluir={onExcluir}
+        onExcluir={handleOpenExcluirModal}
       />
 
       <ModalNovaMovimentacao
@@ -86,6 +113,26 @@ export function SecaoMovimentacoes({
         onClose={handleCloseModal}
         movimentacaoParaEditar={movimentacaoParaEditar}
         onSubmit={handleSubmit}
+      />
+
+      <ModalConfirmacao
+        isOpen={!!movimentacaoParaExcluir}
+        titulo="Excluir Movimentação"
+        mensagem={
+          <span>
+            Tem certeza que deseja remover a movimentação{" "}
+            <strong className="text-zinc-900 font-semibold">
+              {movimentacaoParaExcluir?.descricao}
+            </strong>
+            ? Esta ação não poderá ser desfeita.
+          </span>
+        }
+        textoConfirmar="Remover"
+        textoCancelar="Cancelar"
+        variantConfirmar="red"
+        carregando={excluindo}
+        onConfirmar={handleConfirmarExclusao}
+        onCancelar={() => setMovimentacaoParaExcluir(null)}
       />
     </div>
   );

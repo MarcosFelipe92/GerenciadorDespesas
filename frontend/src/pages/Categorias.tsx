@@ -36,11 +36,6 @@ export function Categorias() {
   };
 
   const handleDeleteCategoria = async (id: number) => {
-    const confirmar = window.confirm(
-      "Deseja realmente remover esta categoria?",
-    );
-    if (!confirmar) return;
-
     try {
       await categoriasApi.delete(id);
       await carregarCategorias();

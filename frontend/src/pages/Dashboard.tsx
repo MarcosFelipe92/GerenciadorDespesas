@@ -50,9 +50,6 @@ export default function Dashboard() {
   };
 
   const handleDeleteMovimentacao = async (id: number) => {
-    const confirmar = window.confirm("Deseja realmente remover esta movimentação?");
-    if (!confirmar) return;
-
     try {
       await movimentacoesApi.delete(id);
       await carregarMovimentacoes();

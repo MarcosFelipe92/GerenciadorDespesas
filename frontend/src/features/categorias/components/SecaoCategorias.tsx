@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TabelaCategorias } from "./TabelaCategorias";
 import { ModalNovaCategoria } from "./ModalNovaCategoria";
+import { ModalConfirmacao } from "../../../shared/components/ModalConfirmacao";
 import { Button } from "../../../shared/components/Button";
 import { Plus } from "lucide-react";
 import type { TCategoria } from "../../../types/categorias.types";
@@ -26,6 +27,9 @@ export function SecaoCategorias({
   const [categoriaParaEditar, setCategoriaParaEditar] = useState<
     TCategoria | undefined
   >(undefined);
+  const [categoriaParaExcluir, setCategoriaParaExcluir] =
+    useState<TCategoria | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
 
   const handleOpenNewModal = () => {
     setCategoriaParaEditar(undefined);
@@ -40,6 +44,24 @@ export function SecaoCategorias({
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCategoriaParaEditar(undefined);
+  };
+
+  const handleOpenExcluirModal = (id: number) => {
+    const cat = categorias.find((c) => c.id === id);
+    if (cat) {
+      setCategoriaParaExcluir(cat);
+    }
+  };
+
+  const handleConfirmarExclusao = async () => {
+    if (!categoriaParaExcluir) return;
+    try {
+      setExcluindo(true);
+      await onExcluir(categoriaParaExcluir.id);
+      setCategoriaParaExcluir(null);
+    } finally {
+      setExcluindo(false);
+    }
   };
 
   const handleSubmit = async (payload: TCreateCategoriaPayload) => {
@@ -75,7 +97,7 @@ export function SecaoCategorias({
       <TabelaCategorias
         categorias={categorias}
         onEditar={handleOpenEditModal}
-        onExcluir={onExcluir}
+        onExcluir={handleOpenExcluirModal}
       />
 
       <ModalNovaCategoria
@@ -83,6 +105,26 @@ export function SecaoCategorias({
         onClose={handleCloseModal}
         categoriaParaEditar={categoriaParaEditar}
         onSubmit={handleSubmit}
+      />
+
+      <ModalConfirmacao
+        isOpen={!!categoriaParaExcluir}
+        titulo="Excluir Categoria"
+        mensagem={
+          <span>
+            Tem certeza que deseja remover a categoria{" "}
+            <strong className="text-zinc-900 font-semibold">
+              {categoriaParaExcluir?.descricao}
+            </strong>
+            ? Esta ação não poderá ser desfeita.
+          </span>
+        }
+        textoConfirmar="Remover"
+        textoCancelar="Cancelar"
+        variantConfirmar="red"
+        carregando={excluindo}
+        onConfirmar={handleConfirmarExclusao}
+        onCancelar={() => setCategoriaParaExcluir(null)}
       />
     </div>
   );
